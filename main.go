@@ -14,7 +14,6 @@ type Command struct {
 
 func main() {
 	commands := make(map[string]Command)
-
 	commands = map[string]Command{
 		"help": {
 			Name:        "help",
@@ -23,6 +22,7 @@ func main() {
 				fmt.Println("\tWelcome to PokeDex CLI!")
 				fmt.Println()
 				fmt.Println("\tAvailable commands: ")
+
 				for input, cmd := range commands {
 					fmt.Printf("\t\t%v -- %v", input, cmd.Description)
 					fmt.Println()
@@ -40,6 +40,7 @@ func main() {
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)
+
 	for {
 		fmt.Print("Pokedex > ")
 
@@ -49,7 +50,13 @@ func main() {
 
 		fmt.Println()
 		command := scanner.Text()
-		commands[command].Execute()
+
+		if cmd, ok := commands[command]; ok {
+			cmd.Execute()
+		} else {
+			fmt.Println("\tError: Command not found. Type 'help' to see available commands")
+		}
+
 		fmt.Println()
 	}
 }
