@@ -12,6 +12,7 @@ type Command struct {
 	Name        string
 	Description string
 	Execute     func()
+	MapExecute  func(url string)
 }
 
 type LocationAreaResponse struct {
@@ -51,8 +52,8 @@ func main() {
 		"map": {
 			Name:        "map",
 			Description: "Display 20 locations at a time",
-			Execute: func() {
-				res, errGet := http.Get("https://pokeapi.co/api/v2/location-area/")
+			MapExecute: func(url string) {
+				res, errGet := http.Get(url)
 				if errGet != nil {
 					fmt.Println(errGet)
 				}
@@ -71,6 +72,7 @@ func main() {
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)
+	baseURL := "https://pokeapi.co/api/v2/location-area/"
 
 	for {
 		fmt.Print("Pokedex > ")
@@ -83,7 +85,11 @@ func main() {
 		command := scanner.Text()
 
 		if cmd, ok := commands[command]; ok {
-			cmd.Execute()
+			if command == "map" {
+				cmd.MapExecute(baseURL)
+			} else {
+				cmd.Execute()
+			}
 		} else {
 			fmt.Println("\tError: Command not found. Type 'help' to see available commands")
 		}
