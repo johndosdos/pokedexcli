@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 )
 
@@ -10,6 +12,14 @@ type Command struct {
 	Name        string
 	Description string
 	Execute     func()
+}
+
+type LocationAreaResponse struct {
+	Next     string `json:"next"`
+	Previous any    `json:"previous"`
+	Results  []struct {
+		Name string `json:"name"`
+	} `json:"results"`
 }
 
 func main() {
@@ -35,6 +45,27 @@ func main() {
 			Description: "Exit from the program",
 			Execute: func() {
 				os.Exit(0)
+			},
+		},
+
+		"map": {
+			Name:        "map",
+			Description: "Display 20 locations at a time",
+			Execute: func() {
+				res, errGet := http.Get("https://pokeapi.co/api/v2/location-area/")
+				if errGet != nil {
+					fmt.Println(errGet)
+				}
+				defer res.Body.Close()
+
+				locations := LocationAreaResponse{}
+				if err := json.NewDecoder(res.Body).Decode(&locations); err != nil {
+					fmt.Println(err)
+				}
+
+				for _, location := range locations.Results {
+					fmt.Println(location.Name)
+				}
 			},
 		},
 	}
