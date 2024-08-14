@@ -12,7 +12,7 @@ type Command struct {
 	Name        string
 	Description string
 	Execute     func()
-	MapExecute  func(url string)
+	MapExecute  func(url *string)
 }
 
 type LocationAreaResponse struct {
@@ -52,8 +52,8 @@ func main() {
 		"map": {
 			Name:        "map",
 			Description: "Display 20 locations at a time",
-			MapExecute: func(url string) {
-				res, errGet := http.Get(url)
+			MapExecute: func(url *string) {
+				res, errGet := http.Get(*url)
 				if errGet != nil {
 					fmt.Println(errGet)
 				}
@@ -67,6 +67,8 @@ func main() {
 				for _, location := range locations.Results {
 					fmt.Println(location.Name)
 				}
+
+				*url = locations.Next
 			},
 		},
 	}
@@ -86,7 +88,7 @@ func main() {
 
 		if cmd, ok := commands[command]; ok {
 			if command == "map" {
-				cmd.MapExecute(baseURL)
+				cmd.MapExecute(&baseURL)
 			} else {
 				cmd.Execute()
 			}
