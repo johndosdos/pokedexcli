@@ -12,7 +12,7 @@ type Command struct {
 	Name        string
 	Description string
 	Execute     func()
-	MapExecute  func(url *string)
+	MapExecute  func(locations *LocationAreaResponse)
 }
 
 type LocationAreaResponse struct {
@@ -39,6 +39,8 @@ func processURL(url string) LocationAreaResponse {
 }
 
 func main() {
+	locations := LocationAreaResponse{}
+
 	commands := make(map[string]Command)
 	commands = map[string]Command{
 		"help": {
@@ -67,19 +69,38 @@ func main() {
 		"map": {
 			Name:        "map",
 			Description: "Display 20 locations at a time",
+			MapExecute: func(locations *LocationAreaResponse) {
+				if locations.Results == nil && locations.Next == "" {
+					baseURL := "https://pokeapi.co/api/v2/location-area/"
+					*locations = processURL(baseURL)
+				} else {
+					*locations = processURL(locations.Next)
 				}
 
 				for _, location := range locations.Results {
 					fmt.Println(location.Name)
 				}
+			},
+		},
 
-				*url = locations.Next
+		"mapb": {
+			Name:        "mapb",
+			Description: "Display the previous 20 locations",
+			MapExecute: func(locations *LocationAreaResponse) {
+				if prevURL, ok := locations.Previous.(string); ok {
+					*locations = processURL(prevURL)
+
+					for _, location := range locations.Results {
+						fmt.Println(location.Name)
+					}
+				} else {
+					fmt.Println("This is the first page.")
+				}
 			},
 		},
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)
-	baseURL := "https://pokeapi.co/api/v2/location-area/"
 
 	for {
 		fmt.Print("Pokedex > ")
@@ -92,8 +113,8 @@ func main() {
 		command := scanner.Text()
 
 		if cmd, ok := commands[command]; ok {
-			if command == "map" {
-				cmd.MapExecute(&baseURL)
+			if command == "map" || command == "mapb" {
+				cmd.MapExecute(&locations)
 			} else {
 				cmd.Execute()
 			}
