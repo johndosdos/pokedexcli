@@ -23,6 +23,21 @@ type LocationAreaResponse struct {
 	} `json:"results"`
 }
 
+func processURL(url string) LocationAreaResponse {
+	res, errGet := http.Get(url)
+	if errGet != nil {
+		fmt.Println(errGet)
+	}
+	defer res.Body.Close()
+
+	locations := LocationAreaResponse{}
+	if err := json.NewDecoder(res.Body).Decode(&locations); err != nil {
+		fmt.Println(err)
+	}
+
+	return locations
+}
+
 func main() {
 	commands := make(map[string]Command)
 	commands = map[string]Command{
@@ -52,16 +67,6 @@ func main() {
 		"map": {
 			Name:        "map",
 			Description: "Display 20 locations at a time",
-			MapExecute: func(url *string) {
-				res, errGet := http.Get(*url)
-				if errGet != nil {
-					fmt.Println(errGet)
-				}
-				defer res.Body.Close()
-
-				locations := LocationAreaResponse{}
-				if err := json.NewDecoder(res.Body).Decode(&locations); err != nil {
-					fmt.Println(err)
 				}
 
 				for _, location := range locations.Results {
