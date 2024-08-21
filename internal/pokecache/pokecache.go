@@ -15,3 +15,10 @@ type cacheEntry struct {
 	createdAt time.Time
 	val       []byte
 }
+
+func NewCache(interval time.Duration) *cache {
+	return &cache{
+		cacheMap: make(map[string]cacheEntry),
+		interval: interval,
+	}
+}
