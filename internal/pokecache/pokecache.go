@@ -26,6 +26,15 @@ func (c *cache) Add(url string, val []byte) {
 	}
 }
 
+func (c *cache) Get(url string) ([]byte, bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	val, ok := c.cacheMap[url]
+
+	return val.val, ok
+}
+
 func NewCache(interval time.Duration) *cache {
 	return &cache{
 		cacheMap: make(map[string]cacheEntry),
