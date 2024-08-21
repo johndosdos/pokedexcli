@@ -16,6 +16,16 @@ type cacheEntry struct {
 	val       []byte
 }
 
+func (c *cache) Add(url string, val []byte) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.cacheMap[url] = cacheEntry{
+		createdAt: time.Now(),
+		val:       val,
+	}
+}
+
 func NewCache(interval time.Duration) *cache {
 	return &cache{
 		cacheMap: make(map[string]cacheEntry),
