@@ -44,6 +44,7 @@ func processURL(url string) LocationAreaResponse {
 
 func main() {
 	locations := LocationAreaResponse{}
+	cache := pokecache.NewCache(5)
 
 	commands := make(map[string]Command)
 	commands = map[string]Command{
@@ -77,8 +78,13 @@ func main() {
 				if locations.Results == nil && locations.Next == "" {
 					baseURL := "https://pokeapi.co/api/v2/location-area/"
 					*locations = processURL(baseURL)
+					cache.Add(baseURL, locations.Results)
 				} else {
-					*locations = processURL(locations.Next)
+					if result, ok := cache.Get(locations.Next); ok {
+						locations.Results = result
+					} else {
+						*locations = processURL(locations.Next)
+					}
 				}
 
 				for _, location := range locations.Results {
@@ -92,7 +98,11 @@ func main() {
 			Description: "Display the previous 20 locations",
 			MapExecute: func(locations *LocationAreaResponse) {
 				if prevURL, ok := locations.Previous.(string); ok {
-					*locations = processURL(prevURL)
+					if result, ok := cache.Get(prevURL); ok {
+						locations.Results = result
+					} else {
+						*locations = processURL(prevURL)
+					}
 
 					for _, location := range locations.Results {
 						fmt.Println(location.Name)
