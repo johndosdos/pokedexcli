@@ -7,7 +7,7 @@ import (
 
 type Cache struct {
 	cacheMap map[string]cacheEntry
-	mu       sync.Mutex
+	mu       sync.RWMutex
 	interval time.Duration
 }
 
@@ -30,11 +30,11 @@ func (c *Cache) Add(url string, val []struct {
 	}
 }
 
-	c.mu.Lock()
-	defer c.mu.Unlock()
 func (c *Cache) Get(url string) ([]struct {
 	Name string "json:\"name\""
 }, bool) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 
 	val, ok := c.cacheMap[url]
 
