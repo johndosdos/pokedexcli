@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/johndosdos/pokedexcli/internal/pokecache"
 )
 
 type Command struct {
