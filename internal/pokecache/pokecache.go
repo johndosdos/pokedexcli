@@ -43,6 +43,22 @@ func (c *Cache) Get(url string) ([]struct {
 
 func NewCache(interval time.Duration) *cache {
 	return &cache{
+func (c *Cache) reapLoop(interval time.Duration) {
+	ticker := time.NewTicker(interval * time.Second)
+
+	for {
+		c.mu.Lock()
+		for k, v := range c.cacheMap {
+			if time.Since(v.createdAt) > interval {
+				delete(c.cacheMap, k)
+			}
+		}
+		c.mu.Unlock()
+
+		<-ticker.C
+	}
+}
+
 		cacheMap: make(map[string]cacheEntry),
 		interval: interval,
 	}
