@@ -13,10 +13,14 @@ type Cache struct {
 
 type cacheEntry struct {
 	createdAt time.Time
-	val       []byte
+	val       []struct {
+		Name string `json:"name"`
+	}
 }
 
-func (c *cache) Add(url string, val []byte) {
+func (c *Cache) Add(url string, val []struct {
+	Name string `json:"name"`
+}) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -26,9 +30,11 @@ func (c *cache) Add(url string, val []byte) {
 	}
 }
 
-func (c *cache) Get(url string) ([]byte, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+func (c *Cache) Get(url string) ([]struct {
+	Name string "json:\"name\""
+}, bool) {
 
 	val, ok := c.cacheMap[url]
 
