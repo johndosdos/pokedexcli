@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -28,7 +29,8 @@ type LocationAreaResponse struct {
 func processURL(url string) LocationAreaResponse {
 	res, errGet := http.Get(url)
 	if errGet != nil {
-		fmt.Println(errGet)
+		log.Printf("Error fetching URL %s: %v", url, errGet)
+		return LocationAreaResponse{}
 	}
 	defer res.Body.Close()
 
