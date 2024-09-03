@@ -6,64 +6,70 @@ import (
 )
 
 type Cache struct {
-	cacheMap map[string]cacheEntry
+	CacheMap map[string]cacheEntry
 	mu       sync.RWMutex
 	interval time.Duration
+	done     chan struct{}
 }
 
 type cacheEntry struct {
-	createdAt time.Time
-	val       []struct {
-		Name string `json:"name"`
-	}
+	CreatedAt time.Time
+	val       []byte
 }
 
-func (c *Cache) Add(url string, val []struct {
-	Name string `json:"name"`
-}) {
+func (c *Cache) Add(url string, val []byte) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	c.cacheMap[url] = cacheEntry{
-		createdAt: time.Now(),
+	c.CacheMap[url] = cacheEntry{
+		CreatedAt: time.Now(),
 		val:       val,
 	}
 }
 
-func (c *Cache) Get(url string) ([]struct {
-	Name string "json:\"name\""
-}, bool) {
+func (c *Cache) Get(url string) ([]byte, bool) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	val, ok := c.cacheMap[url]
-
-	return val.val, ok
+	entry, ok := c.CacheMap[url]
+	if !ok || time.Since(entry.CreatedAt) > c.interval {
+		return nil, false
+	}
+	return entry.val, ok
 }
 
-func (c *Cache) reapLoop(interval time.Duration) {
-	ticker := time.NewTicker(interval * time.Second)
+func (c *Cache) reapLoop() {
+	ticker := time.NewTicker(c.interval)
+	defer ticker.Stop()
 
 	for {
-		c.mu.Lock()
-		for k, v := range c.cacheMap {
-			if time.Since(v.createdAt) > interval {
-				delete(c.cacheMap, k)
+		select {
+		case <-ticker.C:
+			c.mu.Lock()
+			for k, v := range c.CacheMap {
+				if time.Since(v.CreatedAt) > c.interval {
+					delete(c.CacheMap, k)
+				}
 			}
-		}
-		c.mu.Unlock()
+			c.mu.Unlock()
 
-		<-ticker.C
+		case <-c.done:
+			return
+		}
+
 	}
+}
+
+func (c *Cache) Stop() {
+	close(c.done)
 }
 
 func NewCache(interval time.Duration) *Cache {
 	cache := &Cache{
-		cacheMap: make(map[string]cacheEntry),
+		CacheMap: make(map[string]cacheEntry),
 		interval: interval,
+		done:     make(chan struct{}),
 	}
-
-	go cache.reapLoop(interval)
-
+	go cache.reapLoop()
 	return cache
 }
