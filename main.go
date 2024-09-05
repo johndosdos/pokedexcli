@@ -8,16 +8,18 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/johndosdos/pokedexcli/internal/pokecache"
 )
 
 type Command struct {
-	Name        string
-	Description string
-	Execute     func()
-	MapExecute  func(locations *LocationAreaResponse) error
+	Name           string
+	Description    string
+	Execute        func()
+	MapExecute     func(locations *LocationAreaResponse) error
+	ExploreExecute func(location string)
 }
 
 type LocationAreaResponse struct {
@@ -155,6 +157,14 @@ func main() {
 				return nil
 			},
 		},
+
+		"explore": {
+			Name:        "explore",
+			Description: "Explore locations from map(b)",
+			ExploreExecute: func(location string) {
+
+			},
+		},
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -168,12 +178,17 @@ func main() {
 
 		fmt.Println()
 		command := scanner.Text()
+		parts := strings.Fields(command)
+		mainCmd := parts[0]
+		subCmd := parts[1]
 
-		if cmd, ok := commands[command]; ok {
-			if command == "map" || command == "mapb" {
+		if cmd, ok := commands[mainCmd]; ok {
+			if mainCmd == "map" || mainCmd == "mapb" {
 				if err := cmd.MapExecute(&locations); err != nil {
 					log.Printf("Error: %v", err)
 				}
+			} else if mainCmd == "explore" {
+				cmd.ExploreExecute(subCmd)
 			} else {
 				cmd.Execute()
 			}
