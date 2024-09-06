@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/johndosdos/pokedexcli/internal/explore"
 	"github.com/johndosdos/pokedexcli/internal/pokecache"
 )
 
@@ -19,7 +20,7 @@ type Command struct {
 	Description    string
 	Execute        func()
 	MapExecute     func(locations *LocationAreaResponse) error
-	ExploreExecute func(location string)
+	ExploreExecute func(location string) error
 }
 
 type LocationAreaResponse struct {
@@ -161,8 +162,20 @@ func main() {
 		"explore": {
 			Name:        "explore",
 			Description: "Explore locations from map(b)",
-			ExploreExecute: func(location string) {
+			ExploreExecute: func(location string) error {
+				ExploreResponseData := explore.Response{}
 
+				url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%s/", location)
+				data, err := processURL(url)
+				if err != nil {
+					return fmt.Errorf("Error fetching URL: %v", err)
+				}
+
+				if err = json.Unmarshal(data, &ExploreResponseData); err != nil {
+					return fmt.Errorf("Parse error: %v", err)
+				}
+
+				return nil
 			},
 		},
 	}
@@ -188,7 +201,9 @@ func main() {
 					log.Printf("Error: %v", err)
 				}
 			} else if mainCmd == "explore" {
-				cmd.ExploreExecute(subCmd)
+				if err := cmd.ExploreExecute(subCmd); err != nil {
+					log.Printf("Error executing command: %v", err)
+				}
 			} else {
 				cmd.Execute()
 			}
