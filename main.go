@@ -191,18 +191,26 @@ func main() {
 
 		fmt.Println()
 		command := scanner.Text()
-		parts := strings.Fields(command)
-		mainCmd := parts[0]
-		subCmd := parts[1]
+		args := strings.Fields(command)
+		mainArg := args[0]
+		secondArg := ""
+		if len(args) == 2 {
+			secondArg = args[1]
+		}
 
-		if cmd, ok := commands[mainCmd]; ok {
-			if mainCmd == "map" || mainCmd == "mapb" {
+		if cmd, ok := commands[mainArg]; ok {
+			if mainArg == "map" || mainArg == "mapb" {
 				if err := cmd.MapExecute(&locations); err != nil {
 					log.Printf("Error: %v", err)
 				}
-			} else if mainCmd == "explore" {
-				if err := cmd.ExploreExecute(subCmd); err != nil {
-					log.Printf("Error executing command: %v", err)
+			} else if mainArg == "explore" {
+				if secondArg == "" {
+					fmt.Println("\tPlease enter the locaton you want to explore.")
+					fmt.Println("\tExample: \"explore [location]\"")
+				} else {
+					if err := cmd.ExploreExecute(secondArg); err != nil {
+						log.Printf("Error executing command: %v", err)
+					}
 				}
 			} else {
 				cmd.Execute()
