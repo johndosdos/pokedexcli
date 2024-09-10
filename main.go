@@ -175,6 +175,11 @@ func main() {
 					return fmt.Errorf("Parse error: %v", err)
 				}
 
+				for _, item := range ExploreResponseData.PokemonEncounters {
+					fmt.Printf("\t* %v", item.Pokemon.Name)
+					fmt.Println()
+				}
+
 				return nil
 			},
 		},
