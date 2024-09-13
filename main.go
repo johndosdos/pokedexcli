@@ -205,6 +205,9 @@ func main() {
 			Description: "Catch pokemon present in that area",
 			PokemonExecute: func(pokemon string) error {
 				PokemonDataResponse := catch.PokemonData{}
+				PokemonSpeciesResponse := catch.PokemonSpecies{}
+
+				// process pokemon data
 				url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%v/", pokemon)
 
 				data, err := processURL(url)
@@ -215,6 +218,21 @@ func main() {
 				if err := json.Unmarshal(data, &PokemonDataResponse); err != nil {
 					return fmt.Errorf("Parse error: %v", err)
 				}
+
+				// process pokemon-species data, specifically the pokemon catch rate
+				url = fmt.Sprintf("https://pokeapi.co/api/v2/pokemon-species/%v/", pokemon)
+
+				data, err = processURL(url)
+				if err != nil {
+					return fmt.Errorf("Error fetching URL: %v", err)
+				}
+
+				if err := json.Unmarshal(data, &PokemonSpeciesResponse); err != nil {
+					return fmt.Errorf("Parse error: %v", err)
+				}
+
+				// call to execute pokemon capture
+				catch.Catch(PokemonDataResponse, PokemonSpeciesResponse)
 
 				return nil
 			},
