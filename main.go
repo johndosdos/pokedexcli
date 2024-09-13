@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/johndosdos/pokedexcli/internal/catch"
 	"github.com/johndosdos/pokedexcli/internal/explore"
 	"github.com/johndosdos/pokedexcli/internal/pokecache"
 )
@@ -21,6 +22,7 @@ type Command struct {
 	Execute        func()
 	MapExecute     func(locations *LocationAreaResponse) error
 	ExploreExecute func(location string) error
+	PokemonExecute func(pokemon string) error
 }
 
 type LocationAreaResponse struct {
@@ -193,6 +195,17 @@ func main() {
 					fmt.Printf("\t* %v", item.Pokemon.Name)
 					fmt.Println()
 				}
+
+				return nil
+			},
+		},
+
+		"catch": {
+			Name:        "Catch",
+			Description: "Catch pokemon present in that area",
+			PokemonExecute: func(pokemon string) error {
+				PokemonDataResponse := catch.PokemonData{}
+				url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%v/", pokemon)
 
 				return nil
 			},
