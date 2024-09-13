@@ -207,6 +207,15 @@ func main() {
 				PokemonDataResponse := catch.PokemonData{}
 				url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%v/", pokemon)
 
+				data, err := processURL(url)
+				if err != nil {
+					return fmt.Errorf("Error fetching URL: %v", err)
+				}
+
+				if err := json.Unmarshal(data, &PokemonDataResponse); err != nil {
+					return fmt.Errorf("Parse error: %v", err)
+				}
+
 				return nil
 			},
 		},
