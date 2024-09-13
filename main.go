@@ -164,11 +164,25 @@ func main() {
 			Description: "Explore locations from map(b)",
 			ExploreExecute: func(location string) error {
 				ExploreResponseData := explore.Response{}
+				cache := pokecache.NewCache(5)
 
 				url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%s/", location)
-				data, err := processURL(url)
-				if err != nil {
-					return fmt.Errorf("Error fetching URL: %v", err)
+
+				var (
+					data  []byte
+					err   error
+					found bool
+				)
+
+				data, found = cache.Get(url)
+				if !found {
+					data, err = processURL(url)
+					if err != nil {
+						return fmt.Errorf("Error fetching URL: %v", err)
+					}
+
+					// Add data to cache
+					cache.Add(url, data)
 				}
 
 				if err = json.Unmarshal(data, &ExploreResponseData); err != nil {
