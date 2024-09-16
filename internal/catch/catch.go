@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"time"
 )
 
 type PokemonData struct {
@@ -74,6 +75,7 @@ func shakeCheck(shakeProb int) bool {
 
 		// Emulate pokeball shake.
 		fmt.Printf("\t%v...\n", i)
+		time.Sleep(1 * time.Second)
 
 		// Generate random number between 0 and 65535 inclusive.
 		randNum := rand.Intn(65535 + 1)
