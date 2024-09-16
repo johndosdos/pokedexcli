@@ -6,16 +6,23 @@ import (
 	"github.com/johndosdos/pokedexcli/internal/catch"
 )
 
-var dex = make(map[string]catch.PokemonData)
-
-func Add(pokemonData catch.PokemonData) {
-	pokemon := pokemonData.Name
-
-	dex[pokemon] = pokemonData
+type Pokedex struct {
+	dex map[string]catch.PokemonData
 }
 
-func Read(pokemon string) (catch.PokemonData, error) {
-	data, found := dex[pokemon]
+func NewPokedex() *Pokedex {
+	return &Pokedex{
+		dex: make(map[string]catch.PokemonData),
+	}
+}
+
+func (p *Pokedex) Add(pokemonData catch.PokemonData) {
+	pokemon := pokemonData.Name
+	p.dex[pokemon] = pokemonData
+}
+
+func (p *Pokedex) Read(pokemon string) (catch.PokemonData, error) {
+	data, found := p.dex[pokemon]
 	if !found {
 		return catch.PokemonData{}, fmt.Errorf("Pokemon not found.")
 	}
