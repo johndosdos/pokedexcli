@@ -270,6 +270,15 @@ func main() {
 						log.Printf("Error executing command: %v", err)
 					}
 				}
+			} else if mainArg == "catch" {
+				if secondArg == "" {
+					fmt.Println("\tPlease enter the Pokemon you want to catch.")
+					fmt.Println("\tExample: \"catch [pokemon]\"")
+				} else {
+					if err := cmd.PokemonExecute(secondArg); err != nil {
+						log.Printf("Error executing command: %v", err)
+					}
+				}
 			} else {
 				cmd.Execute()
 			}
