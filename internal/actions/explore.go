@@ -1,4 +1,4 @@
-package explore
+package action
 
 type Response struct {
 	PokemonEncounters []PokemonEncounters `json:"pokemon_encounters"`
