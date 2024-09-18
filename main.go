@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/johndosdos/pokedexcli/internal/catch"
-	"github.com/johndosdos/pokedexcli/internal/explore"
+	"github.com/johndosdos/pokedexcli/internal/actions"
 	"github.com/johndosdos/pokedexcli/internal/pokecache"
+	"github.com/johndosdos/pokedexcli/internal/pokemon"
 )
 
 type Command struct {
@@ -165,7 +165,7 @@ func main() {
 			Name:        "explore",
 			Description: "Explore locations from map(b)",
 			ExploreExecute: func(location string) error {
-				ExploreResponseData := explore.Response{}
+				ExploreResponseData := actions.Response{}
 				cache := pokecache.NewCache(5)
 
 				url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%s/", location)
@@ -203,12 +203,12 @@ func main() {
 		"catch": {
 			Name:        "Catch",
 			Description: "Catch pokemon present in that area",
-			PokemonExecute: func(pokemon string) error {
-				PokemonDataResponse := catch.PokemonData{}
-				PokemonSpeciesResponse := catch.PokemonSpecies{}
+			PokemonExecute: func(pokemonName string) error {
+				PokemonDataResponse := pokemon.PokemonData{}
+				PokemonSpeciesResponse := pokemon.PokemonSpecies{}
 
 				// process pokemon data
-				url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%v/", pokemon)
+				url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%v/", pokemonName)
 				data, err := processURL(url)
 				if err != nil {
 					return fmt.Errorf("Error fetching URL: %v", err)
@@ -218,7 +218,7 @@ func main() {
 				}
 
 				// process pokemon-species data, specifically the pokemon catch rate
-				url = fmt.Sprintf("https://pokeapi.co/api/v2/pokemon-species/%v/", pokemon)
+				url = fmt.Sprintf("https://pokeapi.co/api/v2/pokemon-species/%v/", pokemonName)
 				data, err = processURL(url)
 				if err != nil {
 					return fmt.Errorf("Error fetching URL: %v", err)
@@ -228,7 +228,7 @@ func main() {
 				}
 
 				// call to execute pokemon capture
-				err = catch.Catch(PokemonDataResponse, PokemonSpeciesResponse)
+				err = actions.Catch(PokemonDataResponse, PokemonSpeciesResponse)
 				if err != nil {
 					return fmt.Errorf("Error catching pokemon: %v", err)
 				}

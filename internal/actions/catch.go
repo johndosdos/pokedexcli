@@ -1,4 +1,4 @@
-package action
+package actions
 
 import (
 	"fmt"
@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/johndosdos/pokedexcli/internal/pokedex"
 	"github.com/johndosdos/pokedexcli/internal/pokemon"
 )
 
@@ -15,7 +14,7 @@ func Catch(pokemonData pokemon.PokemonData, catchRateData pokemon.PokemonSpecies
 		return fmt.Errorf("No pokemon data found")
 	}
 
-	pokedex := pokedex.NewPokedex()
+	// pokedex := pokedex.NewPokedex()
 	catchRate := catchRateData.CaptureRate
 
 	// The formulas used are from the GEN 3 pokemon games.
