@@ -29,3 +29,19 @@ func (p *Pokedex) Read(pokemonName string) (pokemon.PokemonData, error) {
 
 	return data, nil
 }
+
+func (p *Pokedex) ListCaught() error {
+	if len(p.dex) == 0 {
+		return fmt.Errorf("Pokedex is empty, cannot print.")
+	}
+
+	fmt.Println("\tCaught Pokemons:")
+
+	counter := 1
+	for pokemonName := range p.dex {
+		fmt.Printf("\t%v: %v\n", counter, pokemonName)
+		counter++
+	}
+
+	return nil
+}
