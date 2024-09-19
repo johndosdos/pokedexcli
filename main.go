@@ -24,6 +24,7 @@ type Command struct {
 	MapExecute     func(locations *LocationAreaResponse) error
 	ExploreExecute func(location string) error
 	PokemonExecute func(pokemon string) error
+	InspectExecute func(pokemon string) error
 }
 
 type LocationAreaResponse struct {
@@ -234,6 +235,33 @@ func main() {
 				err = actions.Catch(PokemonDataResponse, PokemonSpeciesResponse, pokedex)
 				if err != nil {
 					return fmt.Errorf("Error catching pokemon: %v", err)
+				}
+
+				return nil
+			},
+		},
+
+		"inspect": {
+			Name:        "inspect",
+			Description: "Inspect your PokeDex.",
+			InspectExecute: func(pokemonName string) error {
+				// code here
+				data, err := pokedex.Read(pokemonName)
+				if err != nil {
+					log.Printf("Error reading from PokeDex: %v", err)
+				}
+
+				fmt.Printf("\tName: %v\n", data.Name)
+				fmt.Printf("\tHeight: %v\n", data.Height)
+				fmt.Printf("\tWeight: %v\n", data.Weight)
+				fmt.Println("\tStats:")
+				for _, stat := range data.Stats {
+					fmt.Printf("\t    %v:", stat.Stat.Name)
+					fmt.Printf(" %v,\n", stat.BaseStat)
+				}
+				fmt.Println("\tTypes:")
+				for _, types := range data.Types {
+					fmt.Printf("\t   %v,\n", types.Type.Name)
 				}
 
 				return nil
