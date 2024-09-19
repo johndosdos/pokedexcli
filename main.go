@@ -267,6 +267,17 @@ func main() {
 				return nil
 			},
 		},
+
+		"pokedex": {
+			Name:        "pokedex",
+			Description: "View all caught Pokemon.",
+			Execute: func() {
+				err := pokedex.ListCaught()
+				if err != nil {
+					log.Println(err)
+				}
+			},
+		},
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)
