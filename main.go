@@ -292,6 +292,10 @@ func main() {
 		fmt.Println()
 		command := scanner.Text()
 		args := strings.Fields(command)
+		if len(args) == 0 {
+			continue
+		}
+
 		mainArg := args[0]
 		secondArg := ""
 		if len(args) == 2 {
