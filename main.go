@@ -310,6 +310,11 @@ func main() {
 						log.Printf("Error executing command: %v", err)
 					}
 				}
+			} else if mainArg == "inspect" {
+				err := cmd.InspectExecute(secondArg)
+				if err != nil {
+					log.Printf("Failed to inspect Pokemon: %v", err)
+				}
 			} else {
 				cmd.Execute()
 			}
