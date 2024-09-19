@@ -330,6 +330,8 @@ func main() {
 				if err != nil {
 					log.Printf("Failed to inspect Pokemon: %v", err)
 				}
+			} else if mainArg == "pokedex" {
+				cmd.Execute()
 			} else {
 				cmd.Execute()
 			}
