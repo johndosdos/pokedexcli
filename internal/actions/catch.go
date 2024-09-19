@@ -6,15 +6,15 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/johndosdos/pokedexcli/internal/pokedex"
 	"github.com/johndosdos/pokedexcli/internal/pokemon"
 )
 
-func Catch(pokemonData pokemon.PokemonData, catchRateData pokemon.PokemonSpecies) error {
+func Catch(pokemonData pokemon.PokemonData, catchRateData pokemon.PokemonSpecies, pokedex *pokedex.Pokedex) error {
 	if pokemonData.Name == "" {
 		return fmt.Errorf("No pokemon data found")
 	}
 
-	// pokedex := pokedex.NewPokedex()
 	catchRate := catchRateData.CaptureRate
 
 	// The formulas used are from the GEN 3 pokemon games.
@@ -31,6 +31,7 @@ func Catch(pokemonData pokemon.PokemonData, catchRateData pokemon.PokemonSpecies
 
 	isSuccess := shakeCheck(shakeProb)
 	if isSuccess {
+		pokedex.Add(pokemonData)
 		fmt.Printf("\t%v was caught! Nice work.", pokemonData.Name)
 	} else {
 		fmt.Printf("\tFailed to catch %v. Better luck next time!", pokemonData.Name)
