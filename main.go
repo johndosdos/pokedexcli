@@ -13,6 +13,7 @@ import (
 
 	"github.com/johndosdos/pokedexcli/internal/actions"
 	"github.com/johndosdos/pokedexcli/internal/pokecache"
+	"github.com/johndosdos/pokedexcli/internal/pokedex"
 	"github.com/johndosdos/pokedexcli/internal/pokemon"
 )
 
@@ -52,6 +53,8 @@ func main() {
 	locations := LocationAreaResponse{}
 	cache := pokecache.NewCache(2 * time.Second)
 	defer cache.Stop()
+
+	pokedex := pokedex.NewPokedex()
 
 	commands := make(map[string]Command)
 	commands = map[string]Command{
@@ -228,7 +231,7 @@ func main() {
 				}
 
 				// call to execute pokemon capture
-				err = actions.Catch(PokemonDataResponse, PokemonSpeciesResponse)
+				err = actions.Catch(PokemonDataResponse, PokemonSpeciesResponse, pokedex)
 				if err != nil {
 					return fmt.Errorf("Error catching pokemon: %v", err)
 				}
