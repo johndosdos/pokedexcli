@@ -22,7 +22,7 @@ func Catch(pokemonData pokemon.PokemonData, catchRateData pokemon.PokemonSpecies
 
 	// Probability = (((3 * Max HP - 2 * Current HP) * Modified Catch Rate * Ball Bonus) / (3 * Max HP)) * Status Bonus
 	// Simplified catch rate formula.
-	modifiedCatchRate := (float64(1.0) / 3) * float64(catchRate)
+	modifiedCatchRate := (float64(1.0) / 3) * float64(catchRate) * 2
 
 	// Shake probability. A shake is where the pokeball shakes before a successful or failed capture.
 	shakeProb := int(1048560 / (math.Sqrt(math.Sqrt((16711680 / modifiedCatchRate)))))
